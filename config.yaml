@@ -1,0 +1,5 @@
+
+organism: "Haemonchus"
+out_directory: "Hc_test"
+ncbi_api: "d4298b86aa9b9f94d974ea48d1152cc60e08"
+threads: 6
