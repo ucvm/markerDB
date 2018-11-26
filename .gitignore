@@ -1,3 +1,5 @@
 .Snakefile.swp
 .snakemake/
-Hc_test/
+*_test/
+dev.R
+
