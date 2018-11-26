@@ -1,0 +1,8 @@
+name: cmscan
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+  - r
+dependencies:
+  - infernal=1.1.2
