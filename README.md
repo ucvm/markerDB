@@ -36,8 +36,9 @@ First clone the repository to a location desired:
 git clone https://github.com/ucvm/its2Builder.git
 ```
 
+### Configuration
 
-Now edit the `config.yaml` file with a file editor of your choice and adjust the following parameters as you see fit.
+Edit the `config.yaml` file with a file editor of your choice and adjust the following parameters as you see fit.
 
 *organism*: This is added to the NCBI search string to restrict the search to a taxonomy of interest.
 *out_directory*: Output directory to store the files.  Will be created if it doesn't exist
@@ -47,6 +48,8 @@ Now edit the `config.yaml` file with a file editor of your choice and adjust the
 *ncbi_api*: Because this pipeline searchs the NCBI nucleotide database and downloads thousands of sequences it's required to have an account and API key (see above on how to get one).
 *threads*: The number of CPU threads that Snakemake can use to run jobs.
 
+### Run it
+
 Now run it with 2 threads:
 
 ```
@@ -55,7 +58,11 @@ snakemake -j 2 --use-conda
 
 The output databases will be named by their format (see Details below) with `.fasta`.  The other files can be deleted to save space but usually aren't too big and can save time if you want to rerun some of the steps without re-downloading all the sequences again.
 
+The first run will take a little bit longer as Snakemake will build the conda environments.  
 
+### Compute requirements
+
+Mostly time :clock:.  `cmscan` is the main time consuming process and can be sped up to some degree by providing more threads.  The pipeline doesn't require excesive memory and can likely be run on a decently powered desktop in a few hours. But this depends strongly on the number of sequences being downloaded. Snakemake has excellent support for compute clusters so if you have access to one this is recommended.  Please see the Snakemake documentation for more details on how to do this.  Also note that this will run on MacOS or Linux only as with the majority of bioinformatics applications.
 
 ## Details :mag:
 
@@ -87,12 +94,18 @@ Current the its2Builder outputs 3 common formats used for assigning taxonomy.
 * RDP: to train a custom RDP database with the `rRDP` Bioconductor package (this is pretty much the same as `assignTaxonomy`)
 * mothur: a fasta file and paired mothur taxonomy file.  Works with the [Nemabiome](https://www.nemabiome.ca/) pipeline.
 
-## TODO
+
+## TODO :hammer:
 
 * Add update step to avoid redownloading existing sequences
   - this will likely entail an ids file that lists all searched sequences
 * Some sort of filtering on per species basis.  There are some clear outliers that need to be cleaned out.
 
+## For the pros :trophy:
+
+For doing it your own way the best bet is to fork the repository and edit away.  This way your changes will be preserved so you can publishe them properly!  Pull requests are welcome but need to be broadly useful and well tested.
+
+Other typos/errors can also be corrected with pull requests or by submitting an issue.
 
 
 
