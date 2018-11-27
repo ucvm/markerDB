@@ -4,7 +4,7 @@
 
 its2Builder is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) pipeline to build databases of the eukaryotic ITS2 sequence for a given taxonomy.  It retrieves ITS2 annotated sequences, trims off 5.8S and 28S sequences if necessary and formats them for common pipelins like RDP, dada2 and mothur.
 
-## Install
+## Install :computer:
 
 The only dependency to run the pipeline is an up-to-date conda install with a recent version of Snakemake.  If you don't already use conda then you can follow the instructions on the [Conda](https://conda.io/docs/user-guide/install/index.html) website.  Make sure to install the *Python 3* version of Miniconda.
 
@@ -28,7 +28,7 @@ source activate its2Builder
 
 Then you'll want to make sure you have an [NCBI account](https://www.ncbi.nlm.nih.gov/account/) from which you'll get an API Key on the account setting page.
 
-## Running the pipeline
+## Running the pipeline :gear: 
 
 First clone the repository to a location desired:
 
@@ -47,7 +47,7 @@ Now edit the `config.yaml` file with a file editor of your choice and adjust the
 *ncbi_api*: Because this pipeline searchs the NCBI nucleotide database and downloads thousands of sequences it's required to have an account and API key (see above on how to get one).
 *threads*: The number of CPU threads that Snakemake can use to run jobs.
 
-## Details
+## Details :mag:
 
 ### Step 1: Get sequences
 
