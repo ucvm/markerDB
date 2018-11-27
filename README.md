@@ -47,6 +47,16 @@ Now edit the `config.yaml` file with a file editor of your choice and adjust the
 *ncbi_api*: Because this pipeline searchs the NCBI nucleotide database and downloads thousands of sequences it's required to have an account and API key (see above on how to get one).
 *threads*: The number of CPU threads that Snakemake can use to run jobs.
 
+Now run it with 2 threads:
+
+```
+snakemake -j 2 --use-conda
+```
+
+The output databases will be named by their format (see Details below) with `.fasta`.  The other files can be deleted to save space but usually aren't too big and can save time if you want to rerun some of the steps without re-downloading all the sequences again.
+
+
+
 ## Details :mag:
 
 ### Step 1: Get sequences
