@@ -62,7 +62,7 @@ The first run will take a little bit longer as Snakemake will build the conda en
 
 ### Compute requirements
 
-Mostly time :clock:.  `cmscan` is the main time consuming process and can be sped up to some degree by providing more threads.  The pipeline doesn't require excesive memory and can likely be run on a decently powered desktop in a few hours. But this depends strongly on the number of sequences being downloaded. Snakemake has excellent support for compute clusters so if you have access to one this is recommended.  Please see the Snakemake documentation for more details on how to do this.  Also note that this will run on MacOS or Linux only as with the majority of bioinformatics applications.
+Mostly time :hourglass:.  `cmscan` is the main time consuming process and can be sped up to some degree by providing more threads.  The pipeline doesn't require excesive memory and can likely be run on a decently powered desktop in a few hours. But this depends strongly on the number of sequences being downloaded. Snakemake has excellent support for compute clusters so if you have access to one this is recommended.  Please see the Snakemake documentation for more details on how to do this.  Also note that this will run on MacOS or Linux only as with the majority of bioinformatics applications.
 
 ## Details :mag:
 
