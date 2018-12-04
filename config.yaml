@@ -1,16 +1,21 @@
 # Pipeline configuration
 
 # --- output
-organism: "Trichuris"
-out_directory: "Tr_test"
+organism: "Nematoda"
+out_directory: "Nematoda"
 
 # --- trimming
 max_width: 700
 min_width: 100
 return_untrimmed: TRUE
 
+# --- clustering
+clusterid: 0.8
+
 # --- General
 ncbi_api: "d4298b86aa9b9f94d974ea48d1152cc60e08"
-threads: 6
+threads: 40 
+
+
 
 

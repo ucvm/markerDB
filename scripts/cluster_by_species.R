@@ -22,6 +22,8 @@ mothur_file = snakemake@output$mothur
 mothur_tax = snakemake@output$mothur_tax
 dada2_file = snakemake@output$dada2
 
+clusterid = snakemake@config$clusterid
+
 # Get sequences and taxonomy info -----------------------------------------
 
 seqs = readDNAStringSet(seq_file)
@@ -36,13 +38,14 @@ db = seq_df %>% left_join(tax)
 
 by_species = db %>% split(db$taxid)
 
+message("Clustering each species at ", round(clusterid * 100, digits = 0), " % identity")
 
 cluster_res = by_species %>% imap(function(t, tax) {
   seq_file = tempfile()
   writeXStringSet(DNAStringSet(setNames(t$seq, t$accn), use.names = TRUE), seq_file)
   cmd = "vsearch"
   outfile = tempfile()
-  args = glue("--cluster_fast {seq_file} -id 0.6 --clusterout_sort --consout - | seqkit head -n1 ")
+  args = glue("--cluster_fast {seq_file} -id {clusterid} --clusterout_sort --consout - | seqkit head -n1 ")
   system2(cmd, args = args, stdout = outfile, stderr = NULL) 
   seqs = readDNAStringSet(outfile)
   names(seqs) = tax
@@ -63,6 +66,8 @@ db_clus = data_frame(taxid = names(clustered_seqs)) %>%
 
 
 # Write out proper formats ------------------------------------------------
+
+message("Writing out clustered data")
 
 # --- dada2
 dada2 = db_clus %>%

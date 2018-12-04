@@ -40,13 +40,21 @@ git clone https://github.com/ucvm/its2Builder.git
 
 Edit the `config.yaml` file with a file editor of your choice and adjust the following parameters as you see fit.
 
-*organism*: This is added to the NCBI search string to restrict the search to a taxonomy of interest.
-*out_directory*: Output directory to store the files.  Will be created if it doesn't exist
-*max_width*: The final sequences will be trimmed to be no more than this many basepairs long.
-*min_width*: As above but minimum width
-*return_trimmed*: Should sequences that didn't have a 5.8S or 28S be returned.  Default is TRUE.  See below for details
-*ncbi_api*: Because this pipeline searchs the NCBI nucleotide database and downloads thousands of sequences it's required to have an account and API key (see above on how to get one).
-*threads*: The number of CPU threads that Snakemake can use to run jobs.
+* *organism*: This is added to the NCBI search string to restrict the search to a taxonomy of interest.
+
+* *out_directory*: Output directory to store the files.  Will be created if it doesn't exist
+
+* *max_width*: The final sequences will be trimmed to be no more than this many basepairs long.
+
+* *min_width*: As above but minimum width
+
+* *return_trimmed*: Should sequences that didn't have a 5.8S or 28S be returned.  Default is TRUE.  See below for details
+
+* *clusterid*: Percent identity to cluster sequences within each species.  Biggest cluster is used to generate a representative sequence for each species - details below.
+
+* *ncbi_api*: Because this pipeline searchs the NCBI nucleotide database and downloads thousands of sequences it's required to have an account and API key (see above on how to get one).
+
+* *threads*: The number of CPU threads that Snakemake can use to run jobs.
 
 ### Run it
 
