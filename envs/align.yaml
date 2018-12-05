@@ -1,0 +1,8 @@
+name: align 
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+  - r
+dependencies:
+  - mafft=7.407
