@@ -21,7 +21,8 @@ rule all:
         "{outdir}/{org}_dada2_clustered.fasta".format(outdir = outdir, org = org),
         "{outdir}/{org}_mothur_clustered.fasta".format(outdir = outdir, org = org),
         "{outdir}/{org}_mothur_clustered.tax".format(outdir = outdir, org = org),
-        "{outdir}/{org}_mothur_clustered.aln".format(outdir = outdir, org = org)
+        "{outdir}/{org}_mothur_clustered.aln".format(outdir = outdir, org = org),
+        "{outdir}/{org}_mothur.aln".format(outdir = outdir, org = org)
 
 
 rule its2_search:
@@ -90,6 +91,22 @@ rule cluster_by_species:
     script:
         "scripts/cluster_by_species.R > {log} 2>&1"
 
+rule align_full:
+    input:
+        rules.write_seqs.output.mothur
+    output:
+        "{outdir}/{org}_mothur.aln".format(outdir = outdir, org = org)
+    conda:
+        "envs/align.yaml"
+    threads:
+        config["threads"]
+    log:
+        "logs/align_full.log"
+    shell:
+        """
+        mafft --auto --reorder --thread {threads} {input} > {output} 2> {log}
+        """
+
 rule align_clustered:
     input:
         rules.cluster_by_species.output.mothur
@@ -100,7 +117,7 @@ rule align_clustered:
     threads:
         config["threads"]
     log:
-        "logs/align.log"
+        "logs/align_clustered.log"
     shell:
         """
         mafft --auto --reorder --thread {threads} {input} > {output} 2> {log}
