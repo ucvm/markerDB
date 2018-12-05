@@ -72,6 +72,7 @@ The first run will take a little bit longer as Snakemake will build the conda en
 
 Mostly time :hourglass:.  `cmscan` is the main time consuming process and can be sped up to some degree by providing more threads.  The pipeline doesn't require excesive memory and can likely be run on a decently powered desktop in a few hours. But this depends strongly on the number of sequences being downloaded. Snakemake has excellent support for compute clusters so if you have access to one this is recommended.  Please see the Snakemake documentation for more details on how to do this.  Also note that this will run on MacOS or Linux only as with the majority of bioinformatics applications.
 
+
 ## Details :mag:
 
 ### Step 1: Get sequences
@@ -94,13 +95,24 @@ After the additional rRNA genes are identified the sequences are trimmed to this
 
 The sequences are then clipped to at most `max_width` and at minimum `min_width`.  Also any redundant sequences that may be present so the database is unique.
 
-### Step 3:  Format database
+### Step 3: Clustering
 
-Current the its2Builder outputs 3 common formats used for assigning taxonomy.  
+A representative sequence for each species (or in this case taxonomic ID) is chosen by clustering the sequences within each species at a given identity threshold (default is 0.8).  Clustering is done with `vsearch --cluster_fast` and the consensus sequence from the largest cluster is returned.  Species with only a single sequence are returned as is.
+
+### Step 4: Alignment
+
+Although not required for many taxonomic classifiers, like RDP, some pipelines do require an alignment and both the clustered and non-clustered versions of the database are aligned using mafft.
+
+### Step 5:  Format database
+
+Current the its2Builder outputs 3 common formats used for assigning taxonomy.  Both the full and clustered versions are output.
 
 * dada2: dada2's `assignTaxonomy` function
 * RDP: to train a custom RDP database with the `rRDP` Bioconductor package (this is pretty much the same as `assignTaxonomy`)
-* mothur: a fasta file and paired mothur taxonomy file.  Works with the [Nemabiome](https://www.nemabiome.ca/) pipeline.
+* mothur: a fasta file and paired mothur taxonomy file.  Works with the [Nemabiome](https://www.nemabiome.ca/) pipeline.  An alignment is also written out that should work with mothur, but can also be used for other pipelines as needed.
+
+The seqinfo.tsv file is a tab-separated text file that contains the taxonomy information for all sequences and can be easily imported into R or Python or (if you must) be opened in Excel.
+
 
 
 ## TODO :hammer:
