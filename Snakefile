@@ -17,11 +17,6 @@ rule all:
         "{outdir}/{org}_dada2.fasta".format(outdir = outdir, org = org),
         "{outdir}/{org}_mothur.fasta".format(outdir = outdir, org = org),
         "{outdir}/{org}_mothur.tax".format(outdir = outdir, org = org),
-        "{outdir}/{org}_rdp_clustered.fasta".format(outdir = outdir, org = org),
-        "{outdir}/{org}_dada2_clustered.fasta".format(outdir = outdir, org = org),
-        "{outdir}/{org}_mothur_clustered.fasta".format(outdir = outdir, org = org),
-        "{outdir}/{org}_mothur_clustered.tax".format(outdir = outdir, org = org),
-        "{outdir}/{org}_mothur_clustered.aln".format(outdir = outdir, org = org),
         "{outdir}/{org}_mothur.aln".format(outdir = outdir, org = org)
 
 

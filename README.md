@@ -50,8 +50,6 @@ Edit the `config.yaml` file with a file editor of your choice and adjust the fol
 
 * *return_trimmed*: Should sequences that didn't have a 5.8S or 28S be returned.  Default is TRUE.  See below for details
 
-* *clusterid*: Percent identity to cluster sequences within each species.  Biggest cluster is used to generate a representative sequence for each species - details below.
-
 * *ncbi_api*: Because this pipeline searchs the NCBI nucleotide database and downloads thousands of sequences it's required to have an account and API key (see above on how to get one).
 
 * *threads*: The number of CPU threads that Snakemake can use to run jobs.
@@ -95,17 +93,13 @@ After the additional rRNA genes are identified the sequences are trimmed to this
 
 The sequences are then clipped to at most `max_width` and at minimum `min_width`.  Also any redundant sequences that may be present so the database is unique.
 
-### Step 3: Clustering
-
-A representative sequence for each species (or in this case taxonomic ID) is chosen by clustering the sequences within each species at a given identity threshold (default is 0.8).  Clustering is done with `vsearch --cluster_fast` and the consensus sequence from the largest cluster is returned.  Species with only a single sequence are returned as is.
-
-### Step 4: Alignment
+### Step 5: Alignment
 
 Although not required for many taxonomic classifiers, like RDP, some pipelines do require an alignment and both the clustered and non-clustered versions of the database are aligned using mafft.
 
-### Step 5:  Format database
+### Step 6:  Format database
 
-Current the its2Builder outputs 3 common formats used for assigning taxonomy.  Both the full and clustered versions are output.
+Current the its2Builder outputs 3 common formats used for assigning taxonomy.  
 
 * dada2: dada2's `assignTaxonomy` function
 * RDP: to train a custom RDP database with the `rRDP` Bioconductor package (this is pretty much the same as `assignTaxonomy`)
