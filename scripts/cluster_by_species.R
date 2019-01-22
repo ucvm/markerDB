@@ -97,6 +97,7 @@ mothur = db_clus  %>%
   mutate(species = str_replace_all(species, " ", "_")) %>%
   mutate(tax = str_c(superkingdom, kingdom, phylum, class, order,
                      family, genus, species, sep = ";")) %>%
+  mutate(tax = str_c(tax, ";")) %>%
   select(taxid, tax)
 
 writeXStringSet(clustered_seqs, mothur_file)

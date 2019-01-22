@@ -2,7 +2,7 @@
 
 # --- output
 organism: "Nematoda"
-out_directory: "Nematoda"
+out_directory: "nematode_ITS2_db"
 
 # --- trimming
 max_width: 700

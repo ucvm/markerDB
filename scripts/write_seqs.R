@@ -64,6 +64,7 @@ mothur = db  %>%
   mutate(species = str_replace_all(species, " ", "_")) %>%
   mutate(tax = str_c(superkingdom, kingdom, phylum, class, order,
                      family, genus, species, sep = ";")) %>%
+  mutate(tax = str_c(tax, ";")) %>%
   select(accn, tax)
 
 writeXStringSet(seqs, mothur_file)

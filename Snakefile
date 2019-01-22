@@ -89,7 +89,7 @@ rule cluster_by_species:
     log:
         "logs/cluster_by_species.log"
     script:
-        "scripts/cluster_by_species.R > {log} 2>&1"
+        "scripts/cluster_by_species.R"
 
 rule align_full:
     input:
