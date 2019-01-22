@@ -93,11 +93,11 @@ After the additional rRNA genes are identified the sequences are trimmed to this
 
 The sequences are then clipped to at most `max_width` and at minimum `min_width`.  Also any redundant sequences that may be present so the database is unique.
 
-### Step 5: Alignment
+### Step 4: Alignment
 
 Although not required for many taxonomic classifiers, like RDP, some pipelines do require an alignment and both the clustered and non-clustered versions of the database are aligned using mafft.
 
-### Step 6:  Format database
+### Step 5:  Format database
 
 Current the its2Builder outputs 3 common formats used for assigning taxonomy.  
 
