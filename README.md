@@ -1,8 +1,8 @@
-# Build ITS2 databases
+# Build marker gene databases
 
 ## Overview
 
-its2Builder is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) pipeline to build databases of the eukaryotic ITS2 sequence for a given taxonomy.  It retrieves ITS2 annotated sequences, trims off 5.8S and 28S sequences if necessary and formats them for common pipelins like RDP, dada2 and mothur.
+markerDB is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) pipeline to build databases of a marker gene sequence for a given taxonomy.  Currently it only supports ITS2 sequences. The pipeline retrieves ITS2 annotated sequences, trims off 5.8S and 28S sequences if necessary and formats them for common pipelins like RDP, dada2 and mothur.
 
 ## Install :computer:
 
