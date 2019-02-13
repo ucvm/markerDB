@@ -1,17 +1,29 @@
 # Pipeline configuration
 
-# --- output
-organism: "Nematoda"
-out_directory: "nematode_ITS2_db"
+# --- Organsim to restrict search to
+organism: "Trichostrongylidae"
 
-# --- trimming
-max_width: 700
-min_width: 100
+# ---- Marker gene to search.  Currently ITS2 and 18S are supported
+marker: "18S"
+
+# --- Output directory
+out_directory: "Trichostrongylidae_18S"
+
+# --- Marker specific paramters
+
+ITS2:
+  max_width: 700
+  min_width: 100
+
+18S:
+  max_width: 1500
+  min_width: 100
+
 return_untrimmed: TRUE
 
 # --- General
 ncbi_api: "d4298b86aa9b9f94d974ea48d1152cc60e08"
-threads: 40 
+threads: 4 
 
 
 

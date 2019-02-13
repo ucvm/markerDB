@@ -20,7 +20,7 @@ rule all:
         "{outdir}/{org}_mothur.aln".format(outdir = outdir, org = org)
 
 
-rule its2_search:
+rule sequence_search:
     output:
         seqinfo = "{outdir}/{org}_seqinfo.tsv".format(outdir = outdir, org = org),
         seqs = "{outdir}/{org}_raw.fasta".format(outdir = outdir, org = org)
@@ -31,11 +31,11 @@ rule its2_search:
 
 rule cmscan:
     input: 
-        rules.its2_search.output.seqs
+        rules.sequence_search.output.seqs
     output:
         "{outdir}/{org}_cmscan.out".format(outdir = outdir, org = org)
     params: 
-        models = "cm_model/LSU_5S.cm"
+        models = "cm_model/marker_cm_database.cm"
     conda:
         "envs/cmscan.yaml"
     threads: 
@@ -48,7 +48,7 @@ rule cmscan:
 rule trim_seqs:
     input:
         cm = rules.cmscan.output,
-        seqs = rules.its2_search.output.seqs
+        seqs = rules.sequence_search.output.seqs
     output:
         seqs = "{outdir}/{org}_trimmed.fasta".format(outdir = outdir, org = org)
     conda: 
@@ -59,7 +59,7 @@ rule trim_seqs:
 rule write_seqs:
     input:
         seqs = rules.trim_seqs.output.seqs,
-        info = rules.its2_search.output.seqinfo
+        info = rules.sequence_search.output.seqinfo
     output:
         rdp = "{outdir}/{org}_rdp.fasta".format(outdir = outdir, org = org),
         dada2 = "{outdir}/{org}_dada2.fasta".format(outdir = outdir, org = org),
@@ -73,7 +73,7 @@ rule write_seqs:
 rule cluster_by_species:
     input:
         seqs = rules.trim_seqs.output.seqs,
-        info = rules.its2_search.output.seqinfo
+        info = rules.sequence_search.output.seqinfo
     output:
         rdp = "{outdir}/{org}_rdp_clustered.fasta".format(outdir = outdir, org = org),
         dada2 = "{outdir}/{org}_dada2_clustered.fasta".format(outdir = outdir, org = org),
