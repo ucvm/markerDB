@@ -11,13 +11,25 @@ library(dplyr)
 library(readr)
 library(tidyr)
 
-
 organism = snakemake@config$organism
+marker = snakemake@config$marker
 
+
+# make sure we've got a supported marker
+if (!marker %in% c("ITS2", "18S")) {
+	stop(marker, " not supported")
+}
+
+search_text = list(
+	"ITS2" = "(ITS2 OR internal transcribed spacer 2)",
+	"18S" = "18S"
+)
 
 # search nucleotide using provided organism -------------------------------
 
-term = glue("{organism}[ORGN] (ITS2 OR internal transcribed spacer 2)")
+term = glue("{organism}[ORGN] {search_text[[marker]]}")
+
+message("Search NCBI with the following search term ", term)
 search = entrez_search(db = "nucleotide", term = term, use_history = TRUE)
 
 message("Found ", search$count, " hits")
