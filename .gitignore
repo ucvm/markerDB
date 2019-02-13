@@ -1,5 +1,5 @@
 .Snakefile.swp
 .snakemake/
 *_test/
-dev.R
-
+.Rproj.user
+*.Rproj
