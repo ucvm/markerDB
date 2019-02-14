@@ -12,6 +12,7 @@ rule all:
         "{outdir}/{org}_seqinfo.tsv".format(outdir = outdir, org = org),
         "{outdir}/{org}_raw.fasta".format(outdir = outdir, org = org),
         "{outdir}/{org}_cmscan.out".format(outdir = outdir, org = org),
+        "{outdir}/{org}_barrnap.out".format(outdir = outdir, org = org),
         "{outdir}/{org}_trimmed.fasta".format(outdir = outdir, org = org),
         "{outdir}/{org}_rdp.fasta".format(outdir = outdir, org = org),
         "{outdir}/{org}_dada2.fasta".format(outdir = outdir, org = org),
@@ -44,10 +45,25 @@ rule cmscan:
         """
         cmscan --rfam --cut_ga --nohmmonly --tblout {output} --fmt 2 --cpu {threads} {params.models} {input} > /dev/null 2>&1
         """
+        
+rule barrnap:
+	input:
+		rules.sequence_search.output.seqs
+	output:
+		"{outdir}/{org}_barrnap.out".format(outdir = outdir, org = org)
+	conda:
+		"envs/barrnap.yaml"
+	threads: 
+		config["threads"]
+	shell:
+		"""
+		barrnap -k euk -t 8 -l 0.25 -r 0.1 --quiet {input} > {output}
+		"""
 
 rule trim_seqs:
     input:
-        cm = rules.cmscan.output,
+        #hits = rules.cmscan.output,
+        hits = rules.barrnap.output,
         seqs = rules.sequence_search.output.seqs
     output:
         seqs = "{outdir}/{org}_trimmed.fasta".format(outdir = outdir, org = org)

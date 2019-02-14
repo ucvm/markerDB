@@ -6,20 +6,22 @@ organism: "Trichostrongylidae"
 # ---- Marker gene to search.  Currently ITS2 and 18S are supported
 marker: "18S"
 
+# --- search program to use
+# cmscan is from Infernal and uses a secondary sturcture information.  
+# More accurate but very slow.  barrnap uses nhmmer from hmmer3, which
+# doesn't take into account secondary structure but is much quicker.
+search_type: "barrnap"
+
 # --- Output directory
 out_directory: "Trichostrongylidae_18S"
 
 # --- Marker specific paramters
+# set according to the expected length of the marker you are searching
+max_width: 700
+min_width: 100
 
-ITS2:
-  max_width: 700
-  min_width: 100
-
-18S:
-  max_width: 1500
-  min_width: 100
-
-return_untrimmed: TRUE
+# --- should untrimmed sequences be returned.  Valid only for ITS2
+#return_untrimmed: TRUE
 
 # --- General
 ncbi_api: "d4298b86aa9b9f94d974ea48d1152cc60e08"
