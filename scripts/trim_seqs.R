@@ -21,10 +21,10 @@ search_type = snakemake@config$search_type
 # for its2
 model_names = list(
 	"ITS2" = list(
-		cmscan = list(upstream_name = "LSU_rRNA_eukarya",
-								downstream_name = "5_8S_rRNA"),
-		barrnap = list(upstream_name = "28S_rRNA",
-								downstream_name = "5_8S_rRNA")),
+		cmscan = list(upstream_name = "5_8S_rRNA",
+								downstream_name = "LSU_rRNA_eukarya"),
+		barrnap = list(upstream_name = "5_8S_rRNA",
+								downstream_name = "28S_rRNA")),
 	"18S" = list(
 		cmscan = "SSU_rRNA_eukarya",
 		barrnap = "18S_rRNA"
@@ -165,7 +165,9 @@ trim_functions = list(
 		coords = lapply(split_gr, get_coords, upstream_name, downstream_name) 
 	
 		trimmed = 
-			imap(coords, ~subseq(seqs[[.y]], start = .x$start, end = .x$end)) %>% 
+			imap(coords, function(x, y) {
+				subseq(seqs[[y]], start = x$start, end = x$end)
+				}) %>% 
 			DNAStringSet(use.names = TRUE)
 		
 		return(trimmed)
@@ -174,16 +176,16 @@ trim_functions = list(
 
 
 
-
-
 # Run it ------------------------------------------------------------------
 
 
 gr = load_functions[[search_type]](search_file)
 seqs = load_seqs(seq_file)
-seqinfo(gr) = Seqinfo(names(seqs), width(seqs))
 trimmed = trim_functions[[marker]](gr, seqs, model_names[[marker]][[search_type]])
 
+if (return_untrimmed & marker == "ITS2") {
+	trimmed = c(trimmed, seqs[!names(seqs) %in% names(trimmed)])
+}
 
 
 # --- filter to proper lengths and keep only unqiue

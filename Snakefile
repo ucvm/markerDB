@@ -8,17 +8,15 @@ org = config["organism"]
 outdir = config["out_directory"]
 
 rule all:
-    input:
-        "{outdir}/{org}_seqinfo.tsv".format(outdir = outdir, org = org),
-        "{outdir}/{org}_raw.fasta".format(outdir = outdir, org = org),
-        "{outdir}/{org}_cmscan.out".format(outdir = outdir, org = org),
-        "{outdir}/{org}_barrnap.out".format(outdir = outdir, org = org),
-        "{outdir}/{org}_trimmed.fasta".format(outdir = outdir, org = org),
-        "{outdir}/{org}_rdp.fasta".format(outdir = outdir, org = org),
-        "{outdir}/{org}_dada2.fasta".format(outdir = outdir, org = org),
-        "{outdir}/{org}_mothur.fasta".format(outdir = outdir, org = org),
-        "{outdir}/{org}_mothur.tax".format(outdir = outdir, org = org),
-        "{outdir}/{org}_mothur.aln".format(outdir = outdir, org = org)
+	input:
+		"{outdir}/{org}_seqinfo.tsv".format(outdir = outdir, org = org),
+		"{outdir}/{org}_raw.fasta".format(outdir = outdir, org = org),
+		"{outdir}/{org}_trimmed.fasta".format(outdir = outdir, org = org),
+		"{outdir}/{org}_rdp.fasta".format(outdir = outdir, org = org),
+		"{outdir}/{org}_dada2.fasta".format(outdir = outdir, org = org),
+		"{outdir}/{org}_mothur.fasta".format(outdir = outdir, org = org),
+		"{outdir}/{org}_mothur.tax".format(outdir = outdir, org = org),
+		"{outdir}/{org}_mothur.aln".format(outdir = outdir, org = org)
 
 
 rule sequence_search:
@@ -26,9 +24,9 @@ rule sequence_search:
         seqinfo = "{outdir}/{org}_seqinfo.tsv".format(outdir = outdir, org = org),
         seqs = "{outdir}/{org}_raw.fasta".format(outdir = outdir, org = org)
     conda: 
-        "envs/its2_search.yaml"
+        "envs/sequence_search.yaml"
     script:
-        "scripts/its2_search.R"
+        "scripts/sequence_search.R"
 
 rule cmscan:
     input: 
@@ -59,11 +57,17 @@ rule barrnap:
 		"""
 		barrnap -k euk -t 8 -l 0.25 -r 0.1 --quiet {input} > {output}
 		"""
-
+		
+def trim_seq_input(wc):
+	if config["search_type"] == "cmscan":
+		return ["{outdir}/{org}_cmscan.out".format(outdir = outdir, org = org)]
+		
+	if config["search_type"] == "barrnap":
+		return ["{outdir}/{org}_barrnap.out".format(outdir = outdir, org = org)]
+		
 rule trim_seqs:
     input:
-        #hits = rules.cmscan.output,
-        hits = rules.barrnap.output,
+        hits = trim_seq_input,
         seqs = rules.sequence_search.output.seqs
     output:
         seqs = "{outdir}/{org}_trimmed.fasta".format(outdir = outdir, org = org)

@@ -10,18 +10,21 @@ marker: "18S"
 # cmscan is from Infernal and uses a secondary sturcture information.  
 # More accurate but very slow.  barrnap uses nhmmer from hmmer3, which
 # doesn't take into account secondary structure but is much quicker.
-search_type: "barrnap"
+search_type: "cmscan"
 
 # --- Output directory
-out_directory: "Trichostrongylidae_18S"
+out_directory: "Trichostrongylidae_18S_cmscan"
 
 # --- Marker specific paramters
 # set according to the expected length of the marker you are searching
-max_width: 700
-min_width: 100
+# Recommended values:
+# ITS2: max_width: 700 and min_width: 100
+# 18S: max_width: 2000 and min_width: 400
+max_width: 2000
+min_width: 500
 
 # --- should untrimmed sequences be returned.  Valid only for ITS2
-#return_untrimmed: TRUE
+return_untrimmed: TRUE
 
 # --- General
 ncbi_api: "d4298b86aa9b9f94d974ea48d1152cc60e08"
