@@ -115,11 +115,9 @@ rule align_full:
         "envs/align.yaml"
     threads:
         config["threads"]
-    log:
-        "logs/align_full.log"
     shell:
         """
-        mafft --auto --reorder --thread {threads} {input} > {output} 2> {log}
+        mafft --auto --reorder --thread {threads} {input} > {output}
         """
 
 rule align_clustered:

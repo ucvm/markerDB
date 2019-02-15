@@ -18,6 +18,7 @@ outfile = snakemake@output$seqs
 marker = snakemake@config$marker
 search_type = snakemake@config$search_type
 
+
 # for its2
 model_names = list(
 	"ITS2" = list(
@@ -32,53 +33,6 @@ model_names = list(
 )
 
 
-
-# Functions for ITS ----------------------------------------------------------
-# Note these are being retired as this pipeline becomes more general.
-# They're being replace with functions that work with granges objects instead
-
-extract_ITS = function(hits, seq, extend = 0) {
-
-    start = hits$seq_to[which(hits$target_name == "5_8S_rRNA" )]
-    start = start + 1
-
-    end = hits$seq_from[which(hits$target_name == "LSU_rRNA_eukarya" )]
-    end = end - 1
-
-    if (length(end) == 0) {
-      end = length(seq)
-    } else {
-      end = end + extend
-      if (end > length(seq)) end = length(seq)
-    }
-
-    if (length(start) == 0) {
-      start = 1
-    } else {
-      start = start - extend
-      if (sign(start) == -1) start = 1
-    }
-
-    # 5.8S is at the end - no ITS - return empty DNAString
-    if (start > length(seq)) {
-      return(Biostrings::DNAString())
-    }
-
-    seq[start:end]
-}
-
-process_single = function(seq, id, cmscan_df, return_untrimmed) {
-  #id = str_extract(id, "([^\\s]+)")
-  if (id %in% cmscan_df$query_name) {
-    hits = filter(cmscan_df, query_name == id)
-    new_seq = extract_ITS(hits, seq)
-  } else if (return_untrimmed) {
-    new_seq = seq
-  } else {
-    new_seq = DNAString()
-  }
-}
-
 load_functions = list(
 
 	# function to load cmscan output
@@ -92,18 +46,18 @@ load_functions = list(
 		)
 		
 		cm = readr::read_table2(file, comment = "#", col_names = cols)
-		
-		# cm = read.table(file, header = FALSE, col.names = FALSE, comment.char = "#",
-		# 								stringsAsFactors = FALSE) 
+	
 		cm = cm %>% 
 			group_by(query_name, target_name) %>%
-			filter(score == max(score)) %>% ungroup()
+			filter(score == max(score)) %>% ungroup() %>% 
+			mutate(new_seq_from = if_else(strand == "-", seq_to, seq_from),
+						 new_seq_to = if_else(strand == "-", seq_from, seq_to))
 		
 		cm %>% 
 			dplyr::select(
 				seqnames = query_name,
-				start = seq_from,
-				end = seq_to,
+				start = new_seq_from,
+				end = new_seq_to,
 				strand = strand,
 				Name = target_name
 			) %>% makeGRangesFromDataFrame(keep.extra.columns = TRUE)
