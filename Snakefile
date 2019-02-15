@@ -55,7 +55,7 @@ rule barrnap:
 		config["threads"]
 	shell:
 		"""
-		barrnap -k euk -t 8 -l 0.25 -r 0.1 --quiet {input} > {output}
+		barrnap --kingdom euk --threads {threads} --lencutoff 0.25 --reject 0.1 --quiet {input} > {output}
 		"""
 		
 def trim_seq_input(wc):

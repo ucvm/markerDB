@@ -15,7 +15,6 @@ organism = snakemake@config$organism
 marker = snakemake@config$marker
 
 
-
 # make sure we've got a supported marker
 if (!marker %in% c("ITS2", "18S")) {
 	stop(marker, " not supported")
@@ -23,7 +22,7 @@ if (!marker %in% c("ITS2", "18S")) {
 
 search_text = list(
 	"ITS2" = "(ITS2 OR internal transcribed spacer 2)",
-	"18S" = "18S"
+	"18S" = "(18S OR SSU rRNA OR SSU OR rRNA)"
 )
 
 term = glue("{organism}[ORGN] {search_text[[marker]]}")
