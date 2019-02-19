@@ -8,6 +8,7 @@ library(Biostrings)
 library(dplyr)
 library(stringr)
 library(purrr)
+library(readr)
 
 search_file = snakemake@input$hits
 seq_file = snakemake@input$seqs
@@ -86,6 +87,17 @@ get_coords = function(gr, upstream_name, downstream_name) {
 		if (is_empty(end_coord)) end_coord = NA
 		return(list(start = start_coord, end = end_coord))
 }
+
+# get_coords_df = function(start, end, Name, upstream_name, downstream_name) {
+# 		start_coord = end[Name == upstream_name]
+# 		end_coord = start[Name == downstream_name]
+# 		if (is_empty(start_coord)) start_coord = NA
+# 		if (is_empty(end_coord)) end_coord = NA
+# 		return(tibble(start = start_coord, end = end_coord))
+# }
+# 
+# coord_df = gr_df %>% split(.$seqnames) %>% 
+# 	map_dfr(~get_coords_df(.x$start, .x$end, .x$Name, upstream_name, downstream_name), .id = "seqname")
 
 trim_functions = list(
 	# Function for processing 18S sequences
