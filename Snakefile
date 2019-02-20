@@ -9,10 +9,10 @@ outdir = config["out_directory"]
 
 rule all:
 	input:
-		"{outdir}/db/final.fasta".format(outdir = outdir, org = org),
-		"{outdir}/db/final_nr.fasta".format(outdir = outdir, org = org),
-		"{outdir}/db/final.txt".format(outdir = outdir, org = org),
-		"{outdir}/db/final_nr.txt".format(outdir = outdir, org = org)
+		"{outdir}/db/final.fasta".format(outdir = outdir),
+		"{outdir}/db/final_nr.fasta".format(outdir = outdir),
+		"{outdir}/db/final.txt".format(outdir = outdir),
+		"{outdir}/db/final_nr.txt".format(outdir = outdir)
 
 
 rule sequence_search:
