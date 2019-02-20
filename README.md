@@ -98,7 +98,9 @@ The sequences are then clipped to at most `max_width` and at minimum `min_width`
 
 ### Step 4: Alignment
 
-Although not required for many taxonomic classifiers, like RDP, some pipelines do require an alignment the database is aligned using mafft.
+Although not required for many taxonomic classifiers, like RDP, some pipelines (like mothur) sometimes do require an alignment the database is aligned using mafft.  
+
+This step is not done automatically.  Run `snakemake -j 2 --use-conda align` to generate an aligment. 
 
 ### Step 5:  Outputs
 

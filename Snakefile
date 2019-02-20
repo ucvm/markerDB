@@ -4,7 +4,6 @@ configfile: "config.yaml"
 # set api key 
 os.environ["ENTREZ_KEY"] = config["ncbi_api"]
 
-#org = config["organism"]
 outdir = config["out_directory"]
 
 rule all:
@@ -85,24 +84,8 @@ rule write_seqs_nr:
         "scripts/write_seqs.R"
         
         
-# rule cluster_by_species:
-#     input:
-#         seqs = rules.trim_seqs.output.seqs,
-#         info = rules.sequence_search.output.seqinfo
-#     output:
-#         rdp = "{outdir}/{org}_rdp_clustered.fasta".format(outdir = outdir, org = org),
-#         dada2 = "{outdir}/{org}_dada2_clustered.fasta".format(outdir = outdir, org = org),
-#         mothur = "{outdir}/{org}_mothur_clustered.fasta".format(outdir = outdir, org = org),
-#         mothur_tax = "{outdir}/{org}_mothur_clustered.tax".format(outdir = outdir, org = org)
-#     conda:
-#         "envs/cluster.yaml"
-#     log:
-#         "logs/cluster_by_species.log"
-#     script:
-#         "scripts/cluster_by_species.R"
 
-
-rule align_full:
+rule align:
     input:
         rules.write_seqs.output.mothur
     output:
