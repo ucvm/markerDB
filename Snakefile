@@ -4,15 +4,15 @@ configfile: "config.yaml"
 # set api key 
 os.environ["ENTREZ_KEY"] = config["ncbi_api"]
 
-org = config["organism"]
+#org = config["organism"]
 outdir = config["out_directory"]
 
 rule all:
-	input:
-		"{outdir}/db/final.fasta".format(outdir = outdir),
-		"{outdir}/db/final_nr.fasta".format(outdir = outdir),
-		"{outdir}/db/final.txt".format(outdir = outdir),
-		"{outdir}/db/final_nr.txt".format(outdir = outdir)
+    input:
+        "{outdir}/db/final_seqs.fasta".format(outdir = outdir),
+        "{outdir}/db/final_seqs_nr.fasta".format(outdir = outdir),
+        "{outdir}/db/final_taxonomy.txt".format(outdir = outdir),
+        "{outdir}/db/final_taxonomy_nr.txt".format(outdir = outdir)
 
 
 rule sequence_search:
@@ -46,10 +46,10 @@ rule trim_seqs:
         seqs = rules.sequence_search.output.seqs,
         taxa = rules.sequence_search.output.taxa
     output:
-        seqs_final = "{outdir}/db/final_seqs.fasta".format(outdir = outdir, org = org),
-        seqs_final_nr = "{outdir}/db/final_seqs_nr.fasta".format(outdir = outdir, org = org),
-        taxa_final = "{outdir}/db/final_taxonomy.txt".format(outdir = outdir, org = org),
-        taxa_final_nr = "{outdir}/db/final_taxonomy_nr.txt".format(outdir = outdir, org = org)
+        seqs_final = "{outdir}/db/final_seqs.fasta".format(outdir = outdir),
+        seqs_final_nr = "{outdir}/db/final_seqs_nr.fasta".format(outdir = outdir),
+        taxa_final = "{outdir}/db/final_taxonomy.txt".format(outdir = outdir),
+        taxa_final_nr = "{outdir}/db/final_taxonomy_nr.txt".format(outdir = outdir)
     conda: 
         "envs/trim_seqs.yaml"
     script:
