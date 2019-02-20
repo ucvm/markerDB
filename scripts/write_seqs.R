@@ -13,7 +13,7 @@ library(stringr)
 # Inputs and Outputs ------------------------------------------------------
 
 seq_file = snakemake@input$seqs
-tax_file = snakemake@input$info
+tax_file = snakemake@input$taxa
 
 rdp_file = snakemake@output$rdp
 mothur_file = snakemake@output$mothur
@@ -23,52 +23,52 @@ dada2_file = snakemake@output$dada2
 
 # Get sequences and taxonomy info -----------------------------------------
 
-seqs = readDNAStringSet(seq_file)
-tax = read_tsv(tax_file)
+seqs = Biostrings::readDNAStringSet(seq_file)
+tax = readr::read_tsv(tax_file)
 
-seq_df = data_frame(
+seq_df = dplyr::tibble(
   accn = names(seqs),
   seq = as.character(seqs)
 )
 
-db = seq_df %>% left_join(tax)
+db = seq_df %>% dplyr::left_join(tax)
 
 
 # Write out proper formats ------------------------------------------------
 
 # --- dada2
 dada2 = db %>%
-  mutate_all(~str_replace_na(.x)) %>%
-  mutate(species = str_replace_all(species, " ", "_")) %>%
-  mutate(tax = str_c(superkingdom, kingdom, phylum, class, order,
-                     family, genus, species, sep = ";")) %>%
-  pull(tax)
+  dplyr::mutate_all(~stringr::str_replace_na(.x)) %>%
+  dplyr::mutate(species = stringr::str_replace_all(species, " ", "_")) %>%
+  dplyr::mutate(tax = stringr::str_c(superkingdom, kingdom, phylum, class, order,
+  													family, genus, species, sep = ";")) %>%
+  dplyr::pull(tax)
 
-writeXStringSet(setNames(seqs, dada2), dada2_file)
+Biostrings::writeXStringSet(setNames(seqs, dada2), dada2_file)
 
 # --- rdp
 rdp = db  %>%
-  mutate_all(~str_replace_na(.x)) %>%
-  mutate(species = str_replace_all(species, " ", "_")) %>%
-  mutate(tax = str_c("Root", superkingdom, kingdom, phylum, class, order,
-                     family, genus, species, sep = ";")) %>%
-  select(accn, tax) %>%
-  mutate(tax = str_c(accn, tax, sep = " ")) %>%
-  pull(tax)
+  dplyr::mutate_all(~stringr::str_replace_na(.x)) %>%
+  dplyr::mutate(species = stringr::str_replace_all(species, " ", "_")) %>%
+  dplyr::mutate(tax = stringr::str_c("Root", superkingdom, kingdom, phylum, class, order,
+  													family, genus, species, sep = ";")) %>%
+  dplyr::select(accn, tax) %>%
+  dplyr::mutate(tax = stringr::str_c(accn, tax, sep = " ")) %>%
+  dplyr::pull(tax)
 
-writeXStringSet(setNames(seqs, rdp), rdp_file)
+Biostrings::writeXStringSet(setNames(seqs, rdp), rdp_file)
 
 # --- mothur
 mothur = db  %>%
-  mutate_all(~str_replace_na(.x)) %>%
-  mutate(species = str_replace_all(species, " ", "_")) %>%
-  mutate(tax = str_c(superkingdom, kingdom, phylum, class, order,
-                     family, genus, species, sep = ";")) %>%
-  mutate(tax = str_c(tax, ";")) %>%
-  select(accn, tax)
+  dplyr::mutate_all(~stringr::str_replace_na(.x)) %>%
+  dplyr::mutate(species = stringr::str_replace_all(species, " ", "_")) %>%
+  dplyr::mutate(tax = stringr::str_c(superkingdom, kingdom, phylum, class, order,
+  													family, genus, species, sep = ";")) %>%
+  dplyr::mutate(tax = stringr::str_c(tax, ";")) %>%
+  dplyr::select(accn, tax)
 
-writeXStringSet(seqs, mothur_file)
-write_tsv(mothur, mothur_tax, col_names = FALSE)
+Biostrings::writeXStringSet(seqs, mothur_file)
+readr::write_tsv(mothur, mothur_tax, col_names = FALSE)
 
 
 

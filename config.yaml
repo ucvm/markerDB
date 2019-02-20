@@ -1,17 +1,28 @@
 # Pipeline configuration
 
-# --- output
-organism: "Nematoda"
-out_directory: "nematode_ITS2_db"
+# --- Organsim to restrict search to
+organism: ""
 
-# --- trimming
-max_width: 700
-min_width: 100
+# ---- Marker gene to search.  Currently ITS2 and 18S are supported
+marker: "18S"
+
+# --- Output directory
+out_directory: ""
+
+# --- Marker specific paramters
+# set according to the expected length of the marker you are searching
+# Recommended values:
+# ITS2: max_width: 700 and min_width: 100
+# 18S: max_width: 2000 and min_width: 400
+max_width: 2000
+min_width: 500
+
+# --- should untrimmed sequences be returned.  Valid only for ITS2
 return_untrimmed: TRUE
 
 # --- General
-ncbi_api: "d4298b86aa9b9f94d974ea48d1152cc60e08"
-threads: 40 
+ncbi_api: ""
+threads: 4 
 
 
 
