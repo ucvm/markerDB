@@ -9,20 +9,16 @@ outdir = config["out_directory"]
 
 rule all:
 	input:
-		"{outdir}/{org}_seqinfo.tsv".format(outdir = outdir, org = org),
-		"{outdir}/{org}_raw.fasta".format(outdir = outdir, org = org),
-		"{outdir}/{org}_trimmed.fasta".format(outdir = outdir, org = org),
-		"{outdir}/{org}_rdp.fasta".format(outdir = outdir, org = org),
-		"{outdir}/{org}_dada2.fasta".format(outdir = outdir, org = org),
-		"{outdir}/{org}_mothur.fasta".format(outdir = outdir, org = org),
-		"{outdir}/{org}_mothur.tax".format(outdir = outdir, org = org),
-		"{outdir}/{org}_mothur.aln".format(outdir = outdir, org = org)
+		"{outdir}/db/final.fasta".format(outdir = outdir, org = org),
+		"{outdir}/db/final_nr.fasta".format(outdir = outdir, org = org),
+		"{outdir}/db/final.txt".format(outdir = outdir, org = org),
+		"{outdir}/db/final_nr.txt".format(outdir = outdir, org = org)
 
 
 rule sequence_search:
     output:
-        seqinfo = "{outdir}/{org}_seqinfo.tsv".format(outdir = outdir, org = org),
-        seqs = "{outdir}/{org}_raw.fasta".format(outdir = outdir, org = org)
+        taxa = "{outdir}/raw/raw_taxa.tsv".format(outdir = outdir),
+        seqs = "{outdir}/raw/raw_seqs.fasta".format(outdir = outdir)
     conda: 
         "envs/sequence_search.yaml"
     script:
@@ -32,7 +28,7 @@ rule cmscan:
     input: 
         rules.sequence_search.output.seqs
     output:
-        "{outdir}/{org}_cmscan.out".format(outdir = outdir, org = org)
+        "{outdir}/raw/cmscan.out".format(outdir = outdir)
     params: 
         models = "cm_model/marker_cm_database.cm"
     conda:
@@ -44,33 +40,16 @@ rule cmscan:
         cmscan --rfam --cut_ga --nohmmonly --tblout {output} --fmt 2 --cpu {threads} {params.models} {input} > /dev/null 2>&1
         """
         
-rule barrnap:
-	input:
-		rules.sequence_search.output.seqs
-	output:
-		"{outdir}/{org}_barrnap.out".format(outdir = outdir, org = org)
-	conda:
-		"envs/barrnap.yaml"
-	threads: 
-		config["threads"]
-	shell:
-		"""
-		barrnap --kingdom euk --threads {threads} --lencutoff 0.25 --reject 0.1 --quiet {input} > {output}
-		"""
-		
-def trim_seq_input(wc):
-	if config["search_type"] == "cmscan":
-		return ["{outdir}/{org}_cmscan.out".format(outdir = outdir, org = org)]
-		
-	if config["search_type"] == "barrnap":
-		return ["{outdir}/{org}_barrnap.out".format(outdir = outdir, org = org)]
-		
 rule trim_seqs:
     input:
-        hits = trim_seq_input,
-        seqs = rules.sequence_search.output.seqs
+        hits = rules.cmscan.output,
+        seqs = rules.sequence_search.output.seqs,
+        taxa = rules.sequence_search.output.taxa
     output:
-        seqs = "{outdir}/{org}_trimmed.fasta".format(outdir = outdir, org = org)
+        seqs_final = "{outdir}/db/final_seqs.fasta".format(outdir = outdir, org = org),
+        seqs_final_nr = "{outdir}/db/final_seqs_nr.fasta".format(outdir = outdir, org = org),
+        taxa_final = "{outdir}/db/final_taxonomy.txt".format(outdir = outdir, org = org),
+        taxa_final_nr = "{outdir}/db/final_taxonomy_nr.txt".format(outdir = outdir, org = org)
     conda: 
         "envs/trim_seqs.yaml"
     script:
@@ -78,39 +57,56 @@ rule trim_seqs:
 
 rule write_seqs:
     input:
-        seqs = rules.trim_seqs.output.seqs,
-        info = rules.sequence_search.output.seqinfo
+        seqs = rules.trim_seqs.output.seqs_final,
+        taxa = rules.trim_seqs.output.taxa_final,
     output:
-        rdp = "{outdir}/{org}_rdp.fasta".format(outdir = outdir, org = org),
-        dada2 = "{outdir}/{org}_dada2.fasta".format(outdir = outdir, org = org),
-        mothur = "{outdir}/{org}_mothur.fasta".format(outdir = outdir, org = org),
-        mothur_tax = "{outdir}/{org}_mothur.tax".format(outdir = outdir, org = org)
+        rdp = "{outdir}/formats/rdp.fasta".format(outdir = outdir),
+        dada2 = "{outdir}/formats/dada2.fasta".format(outdir = outdir),
+        mothur = "{outdir}/formats/mothur.fasta".format(outdir = outdir),
+        mothur_tax = "{outdir}/formats/mothur.tax".format(outdir = outdir)
     conda:
         "envs/write_seqs.yaml"
     script:
         "scripts/write_seqs.R"
         
-rule cluster_by_species:
+        
+rule write_seqs_nr:
     input:
-        seqs = rules.trim_seqs.output.seqs,
-        info = rules.sequence_search.output.seqinfo
+        seqs = rules.trim_seqs.output.seqs_final_nr,
+        taxa = rules.trim_seqs.output.taxa_final_nr
     output:
-        rdp = "{outdir}/{org}_rdp_clustered.fasta".format(outdir = outdir, org = org),
-        dada2 = "{outdir}/{org}_dada2_clustered.fasta".format(outdir = outdir, org = org),
-        mothur = "{outdir}/{org}_mothur_clustered.fasta".format(outdir = outdir, org = org),
-        mothur_tax = "{outdir}/{org}_mothur_clustered.tax".format(outdir = outdir, org = org)
+        rdp = "{outdir}/formats/rdp_nr.fasta".format(outdir = outdir),
+        dada2 = "{outdir}/formats/dada2_nr.fasta".format(outdir = outdir),
+        mothur = "{outdir}/formats/mothur_nr.fasta".format(outdir = outdir),
+        mothur_tax = "{outdir}/formats/mothur_nr.tax".format(outdir = outdir)
     conda:
-        "envs/cluster.yaml"
-    log:
-        "logs/cluster_by_species.log"
+        "envs/write_seqs.yaml"
     script:
-        "scripts/cluster_by_species.R"
+        "scripts/write_seqs.R"
+        
+        
+# rule cluster_by_species:
+#     input:
+#         seqs = rules.trim_seqs.output.seqs,
+#         info = rules.sequence_search.output.seqinfo
+#     output:
+#         rdp = "{outdir}/{org}_rdp_clustered.fasta".format(outdir = outdir, org = org),
+#         dada2 = "{outdir}/{org}_dada2_clustered.fasta".format(outdir = outdir, org = org),
+#         mothur = "{outdir}/{org}_mothur_clustered.fasta".format(outdir = outdir, org = org),
+#         mothur_tax = "{outdir}/{org}_mothur_clustered.tax".format(outdir = outdir, org = org)
+#     conda:
+#         "envs/cluster.yaml"
+#     log:
+#         "logs/cluster_by_species.log"
+#     script:
+#         "scripts/cluster_by_species.R"
+
 
 rule align_full:
     input:
         rules.write_seqs.output.mothur
     output:
-        "{outdir}/{org}_mothur.aln".format(outdir = outdir, org = org)
+        "{outdir}/formats/mothur.aln".format(outdir = outdir)
     conda:
         "envs/align.yaml"
     threads:
@@ -120,20 +116,5 @@ rule align_full:
         mafft --auto --reorder --thread {threads} {input} > {output}
         """
 
-rule align_clustered:
-    input:
-        rules.cluster_by_species.output.mothur
-    output:
-        "{outdir}/{org}_mothur_clustered.aln".format(outdir = outdir, org = org)
-    conda:
-        "envs/align.yaml"
-    threads:
-        config["threads"]
-    log:
-        "logs/align_clustered.log"
-    shell:
-        """
-        mafft --auto --reorder --thread {threads} {input} > {output} 2> {log}
-        """
 
 

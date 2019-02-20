@@ -14,6 +14,9 @@ library(tidyr)
 organism = snakemake@config$organism
 marker = snakemake@config$marker
 
+seq_outfile = snakemake@output$seqs
+taxa_outfile = snakemake@output$taxa
+
 
 # make sure we've got a supported marker
 if (!marker %in% c("ITS2", "18S")) {
@@ -142,10 +145,10 @@ summaries = get_summaries(search)
 sum_df = summaries_to_dataframe(summaries)
 sum_df = add_acc(sum_df)
 sum_df = add_taxonomy(summaries, sum_df)
-retrieve_and_write_sequences(sum_df$uid, snakemake@output$seqs)
+retrieve_and_write_sequences(sum_df$uid, seq_outfile)
 
 message("Writing taxonomy info")
-write_tsv(sum_df, snakemake@output$seqinfo)
+write_tsv(sum_df, taxa_outfile)
 
 
 

@@ -6,12 +6,6 @@ organism: ""
 # ---- Marker gene to search.  Currently ITS2 and 18S are supported
 marker: "18S"
 
-# --- search program to use
-# cmscan is from Infernal and uses a secondary sturcture information.  
-# More accurate but very slow.  barrnap uses nhmmer from hmmer3, which
-# doesn't take into account secondary structure but is much quicker.
-search_type: "barrnap"
-
 # --- Output directory
 out_directory: ""
 
