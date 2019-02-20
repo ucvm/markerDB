@@ -9,10 +9,10 @@ outdir = config["out_directory"]
 
 rule all:
     input:
-        "{outdir}/db/final_seqs.fasta".format(outdir = outdir),
-        "{outdir}/db/final_seqs_nr.fasta".format(outdir = outdir),
-        "{outdir}/db/final_taxonomy.txt".format(outdir = outdir),
-        "{outdir}/db/final_taxonomy_nr.txt".format(outdir = outdir)
+        "{outdir}/db/seqs.fasta".format(outdir = outdir),
+        "{outdir}/db/seqs_nr.fasta".format(outdir = outdir),
+        "{outdir}/db/taxonomy.txt".format(outdir = outdir),
+        "{outdir}/db/taxonomy_nr.txt".format(outdir = outdir)
 
 
 rule sequence_search:
@@ -46,10 +46,10 @@ rule trim_seqs:
         seqs = rules.sequence_search.output.seqs,
         taxa = rules.sequence_search.output.taxa
     output:
-        seqs_final = "{outdir}/db/final_seqs.fasta".format(outdir = outdir),
-        seqs_final_nr = "{outdir}/db/final_seqs_nr.fasta".format(outdir = outdir),
-        taxa_final = "{outdir}/db/final_taxonomy.txt".format(outdir = outdir),
-        taxa_final_nr = "{outdir}/db/final_taxonomy_nr.txt".format(outdir = outdir)
+        seqs_final = "{outdir}/db/seqs.fasta".format(outdir = outdir),
+        seqs_final_nr = "{outdir}/db/seqs_nr.fasta".format(outdir = outdir),
+        taxa_final = "{outdir}/db/taxonomy.txt".format(outdir = outdir),
+        taxa_final_nr = "{outdir}/db/taxonomy_nr.txt".format(outdir = outdir)
     conda: 
         "envs/trim_seqs.yaml"
     script:
