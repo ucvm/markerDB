@@ -188,7 +188,7 @@ trim = function(cm, seqs, names) {
 	
 	coords = cleaned$cm %>% 
 		split(.$query_name) %>% 
-		imap(~coord_functions[[marker]](.x$target_name, .x$seq_from, .x$seq_to, .x$width, .y)) 
+		imap(~coord_functions[[marker]](.x$target_name, .x$seq_from, .x$seq_to, .x$width, names)) 
 	
 	# and there will still be some with backwards hits, so trash these, seqs too
 	backwards = names(coords[map_lgl(coords, ~.x$start > .$end | .x$start == 0 | .x$end == 0)])
