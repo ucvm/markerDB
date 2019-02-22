@@ -59,10 +59,7 @@ rule write_seqs:
         seqs = rules.trim_seqs.output.seqs_final,
         taxa = rules.trim_seqs.output.taxa_final,
     output:
-        rdp = "{outdir}/formats/rdp.fasta".format(outdir = outdir),
-        dada2 = "{outdir}/formats/dada2.fasta".format(outdir = outdir),
-        mothur = "{outdir}/formats/mothur.fasta".format(outdir = outdir),
-        mothur_tax = "{outdir}/formats/mothur.tax".format(outdir = outdir)
+        directory("{outdir}/formats/full".format(outdir = outdir))
     conda:
         "envs/write_seqs.yaml"
     script:
@@ -72,22 +69,27 @@ rule write_seqs:
 rule write_seqs_nr:
     input:
         seqs = rules.trim_seqs.output.seqs_final_nr,
-        taxa = rules.trim_seqs.output.taxa_final_nr
+        taxa = rules.trim_seqs.output.taxa_final_nr,
     output:
-        rdp = "{outdir}/formats/rdp_nr.fasta".format(outdir = outdir),
-        dada2 = "{outdir}/formats/dada2_nr.fasta".format(outdir = outdir),
-        mothur = "{outdir}/formats/mothur_nr.fasta".format(outdir = outdir),
-        mothur_tax = "{outdir}/formats/mothur_nr.tax".format(outdir = outdir)
+        directory("{outdir}/formats/nr".format(outdir = outdir))
     conda:
         "envs/write_seqs.yaml"
     script:
         "scripts/write_seqs.R"
         
+rule run_app:
+    conda:
+        "envs/app.yaml"
+    params:
+        db_title = "Nematode ITS2",
+        db_dir = outdir
+    script:
+        "scripts/app.R"
         
 
 rule align:
     input:
-        rules.write_seqs.output.mothur
+        "{outdir}/formats/nr/mothur.fasta"
     output:
         "{outdir}/formats/mothur.aln".format(outdir = outdir)
     conda:
