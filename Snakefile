@@ -89,9 +89,9 @@ rule run_app:
 
 rule align:
     input:
-        "{outdir}/formats/nr/mothur.fasta".format(outdir = outdir)
+        rules.trim_seqs.output.seqs_final_nr
     output:
-        "{outdir}/formats/nr/mothur.aln".format(outdir = outdir)
+        "{outdir}/db/seqs_nr.aln".format(outdir = outdir)
     conda:
         "envs/align.yaml"
     threads:
