@@ -6,7 +6,7 @@
 
 
 write_functions = list(
-	dada2 = function(db, seqs, outdir) {
+	dada2 = function(db, seqs, outdir, align = NULL) {
 		
 		outfasta = file.path(outdir,"dada2.fasta")
 		
@@ -22,7 +22,7 @@ write_functions = list(
 		return(outfasta)
 	},
 	
-	rdp = function(db, seqs, outdir) {
+	rdp = function(db, seqs, outdir, align = NULL) {
 		
 		outfasta = file.path(outdir, "rdp.fasta")
 		
@@ -40,10 +40,11 @@ write_functions = list(
 		return(outfasta)
 	},
 	
-	mothur = function(db, seqs, outdir) {
+	mothur = function(db, seqs, outdir, align = NULL) {
 		
 		outfasta = file.path(outdir, "mothur.fasta")
 		outtaxa = file.path(outdir, "mothur.tax")
+		outaln = file.path(outdir, "mothur.aln")
 		
 		mothur = db %>%
 			dplyr::mutate_all(~stringr::str_replace_na(.x)) %>%
@@ -55,8 +56,13 @@ write_functions = list(
 		
 		Biostrings::writeXStringSet(seqs, outfasta)
 		readr::write_tsv(mothur, outtaxa, col_names = FALSE)
+		file_list = list(outfasta, outtaxa)
+		if (!is.null(align)) {
+			Biostrings::writeXStringSet(align, outaln)
+			file_list = c(outaln, file_list)
+		}
 		
-		return(list(outfasta, outtaxa))
+		return(file_list)
 	}
 )
 

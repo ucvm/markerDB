@@ -11,6 +11,7 @@ library(stringr)
 library(DT)
 library(shinyjs)
 library(shinythemes)
+library(purrr)
 
 source("scripts/write_functions.R")
 Sys.setenv(R_ZIPCMD = "/usr/bin/zip")
@@ -25,17 +26,19 @@ load_database = function(db_directory) {
 
 	seqs = readDNAStringSet(file.path(db_directory, "db", "seqs.fasta"))
 	seqs_nr = readDNAStringSet(file.path(db_directory, "db", "seqs_nr.fasta"))
+	align_nr = readDNAStringSet(file.path(db_directory, "db", "seqs_nr.aln"))
 	taxa = read_tsv(file.path(db_directory, "db", "taxonomy.txt"),
 					col_types = "cccffffffff")
 	taxa_nr = read_tsv(file.path(db_directory, "db", "taxonomy_nr.txt"),
 					   col_types = "cccffffffff")
+	
 	
 	db = tibble(accn = names(seqs), sequence = as.character(seqs)) %>% 
 		left_join(taxa) %>% dplyr::select(-sequence, everything())
 	db_nr = tibble(accn = names(seqs_nr), sequence = as.character(seqs_nr)) %>% 
 		left_join(taxa_nr) %>% dplyr::select(-sequence, everything())
 	
-	return(list(db = db, nr = db_nr, seqs = seqs, seqs_nr = seqs_nr))
+	return(list(db = db, nr = db_nr, seqs = seqs, seqs_nr = seqs_nr, align_nr = align_nr))
 }
 
 summarize_database = function(db) {
@@ -147,12 +150,17 @@ server = function(input, output) {
 			tmpdir = tempdir()
 			db = filtered_data()[input$database_rows_all, ]
 			seqs = database$seqs[db$accn]
+			if (!input$show_full) {
+				aln  = database$align_nr[db$accn]
+			} else {
+				aln = NULL
+			}
 			setwd(tmpdir)
 			files = c()
 			write_formats = names(write_functions) %in% input$download_formats
 			if (!is.null(write_formats)) {
 				db_files = invoke_map(write_functions[write_formats],
-								   list(list(db = db, seqs = seqs, outdir = ".")))
+								   list(list(db = db, seqs = seqs, outdir = ".", align = aln)))
 				db_files = flatten(db_files) %>% flatten_chr()
 				files = c(files, db_files)
 			}

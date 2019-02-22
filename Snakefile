@@ -10,6 +10,7 @@ rule all:
     input:
         "{outdir}/db/seqs.fasta".format(outdir = outdir),
         "{outdir}/db/seqs_nr.fasta".format(outdir = outdir),
+        "{outdir}/db/seqs_nr.aln".format(outdir = outdir),
         "{outdir}/db/taxonomy.txt".format(outdir = outdir),
         "{outdir}/db/taxonomy_nr.txt".format(outdir = outdir)
 
@@ -70,6 +71,7 @@ rule write_seqs_nr:
     input:
         seqs = rules.trim_seqs.output.seqs_final_nr,
         taxa = rules.trim_seqs.output.taxa_final_nr,
+        aln = rules.align.output
     output:
         directory("{outdir}/formats/nr".format(outdir = outdir))
     conda:

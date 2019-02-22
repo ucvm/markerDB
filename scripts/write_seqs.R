@@ -18,6 +18,10 @@ seq_file = snakemake@input$seqs
 tax_file = snakemake@input$taxa
 outdir = snakemake@output[[1]]
 
+if (exists(snakemake@input$aln)) {
+	aln = snakemake@input$aln
+}
+
 
 dir.create(outdir, showWarnings = FALSE)
 
@@ -37,7 +41,11 @@ db = seq_df %>% dplyr::left_join(tax)
 
 # Write out proper formats ------------------------------------------------
 
-invoke_map(write_functions, list(list(db = db, seqs = seqs, outdir = outdir)))
+if (exists(aln)) {
+	invoke_map(write_functions, list(list(db = db, seqs = seqs, outdir = outdir, align = aln)))
+} else {
+	invoke_map(write_functions, list(list(db = db, seqs = seqs, outdir = outdir)))
+}
 
 
 
