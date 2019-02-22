@@ -89,9 +89,9 @@ rule run_app:
 
 rule align:
     input:
-        "{outdir}/formats/nr/mothur.fasta"
+        "{outdir}/formats/nr/mothur.fasta".format(outdir = outdir)
     output:
-        "{outdir}/formats/mothur.aln".format(outdir = outdir)
+        "{outdir}/formats/nr/mothur.aln".format(outdir = outdir)
     conda:
         "envs/align.yaml"
     threads:
