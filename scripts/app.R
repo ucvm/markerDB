@@ -12,15 +12,16 @@ library(DT)
 library(shinyjs)
 library(shinythemes)
 library(purrr)
+library(tibble)
+library(glue)
 
-source("scripts/write_functions.R")
+source("write_functions.R")
 Sys.setenv(R_ZIPCMD = "/usr/bin/zip")
 
-# db_dir = "../Nematode_ITS2/"
-# db_title = "Nematode ITS2"
+db_dir = "../Nematode_ITS2/"
 
-db_dir = snakemake@params$db_dir
-db_title = snakemake@params$db_title
+# db_dir = snakemake@params$db_dir
+
 
 load_database = function(db_directory) {
 
@@ -54,6 +55,10 @@ summarize_database = function(db) {
 }
 
 database = load_database(db_dir)
+db_info = read_tsv(file.path(db_dir, "db", "db_info.txt"), comment = "#", 
+									 col_names = c("param", "value")) %>% deframe()
+db_html_list = imap(db_info, ~p(HTML(glue::glue('<strong>{.y}</strong>: {.x}'))))[-1]
+
 
 ui = fluidPage(theme = shinytheme("yeti"),
 
@@ -62,12 +67,23 @@ ui = fluidPage(theme = shinytheme("yeti"),
 
     verticalLayout(
     	
-    	titlePanel(db_title),
+    	titlePanel(db_info[["Title"]]),
     
-    	
+    	fluidRow(
+    		column(3,     		
+				 h3("Summary"),
+				 wellPanel(div(db_html_list))
+    	),
+				column(9,
+					h3("Instructions")	
+				)	 
+    		
+    	),
+    	hr(),
     	fluidRow(
     		column(3,
-	     		h3("Summary"),
+	
+	     		h3("Current Selection:"),
 	     		wellPanel(
         			tableOutput("summary_tbl")
 	     		)
@@ -95,11 +111,19 @@ ui = fluidPage(theme = shinytheme("yeti"),
 					em("Please select a format to download", id = "no_format_text"),
 					hidden(em("The accn column must be selected for database download", id = "no_accn_text")),
 					hidden(downloadButton("download", "Download"))
-    			)
+    			),
+					hidden(
+						div("You've filtered the database.  If you use the filtered version in an analyis",
+								"or publication, please document what you've filtered out to maintain reproducibility",
+								class = "alert alert-warning", role = "alert", id = "filter_alert")
+					)
     		)
-        ),
+    	),
+    	
     	hr(),
-        DT::DTOutput("database")
+			h3("Database"),
+			br(),
+    	DT::DTOutput("database")
     )
 )
 
@@ -116,18 +140,32 @@ server = function(input, output) {
 	})
 	
 	observe({
-		if (is.null(input$download_formats)) {
-			hide("download")
-			show("no_format_text")
-			hide("no_accn_text")
-		} else if (!"accn" %in% colnames(filtered_data())) {
-			hide("download")
-			hide("no_format_text")
-			show("no_accn_text")
+		if (input$show_full) {
+			full = database$db
 		} else {
-			show("download")
-			hide("no_format_text")
-			hide("no_accn_text")
+			full = database$nr
+		}
+		
+		if (length(input$database_rows_all) < nrow(full)) {
+			shinyjs::show("filter_alert")
+		} else {
+			shinyjs::hide("filter_alert")
+		}
+	})
+	
+	observe({
+		if (is.null(input$download_formats)) {
+			shinyjs::hide("download")
+			shinyjs::show("no_format_text")
+			shinyjs::hide("no_accn_text")
+		} else if (!"accn" %in% colnames(filtered_data())) {
+			shinyjs::hide("download")
+			shinyjs::hide("no_format_text")
+			shinyjs::show("no_accn_text")
+		} else {
+			shinyjs::show("download")
+			shinyjs::hide("no_format_text")
+			shinyjs::hide("no_accn_text")
 		}
 	})
 	

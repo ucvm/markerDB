@@ -21,13 +21,15 @@ max_width = snakemake@config$max_width
 min_width = snakemake@config$min_width
 return_untrimmed = snakemake@config$return_untrimmed
 marker = snakemake@config$marker
+version = snakemake@config$version
+outdir = snakemake@config$out_directory
+title = snakemake@config$title
 
 # -- output files
 seqs_outfile = snakemake@output$seqs_final
 seqs_outfile_nr = snakemake@output$seqs_final_nr
 taxa_outfile = snakemake@output$taxa_final
 taxa_outfile_nr = snakemake@output$taxa_final_nr
-
 
 # - names in the hmm model 
 model_names = list(
@@ -248,6 +250,17 @@ writeXStringSet(final_seqs_nr, seqs_outfile_nr)
 write_tsv(final_tax, taxa_outfile)
 write_tsv(final_tax_nr, taxa_outfile_nr)
 
+db_info = list(
+	"# Database Info",
+	paste0("Title\t", title),
+	paste0("Date\t", Sys.Date()),
+	paste0("Total sequences\t", length(final_seqs)),
+	paste0("Total non-redundant sequences\t", length(final_seqs_nr)),
+	paste0("Version\t", version)
+)
+
+
+write_lines(db_info, file.path(outdir, "db", "db_info.txt"))
 
 message("Wrote ", length(final_seqs), " sequences to ", seqs_outfile)
 message("Wrote ", length(final_seqs_nr), " non-redundant sequences to ", seqs_outfile_nr)

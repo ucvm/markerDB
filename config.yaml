@@ -9,6 +9,12 @@ marker: "18S"
 # --- Output directory
 out_directory: ""
 
+# --- database version
+version: 0.9.0
+
+# --- database title
+title: ""
+
 # --- Marker specific paramters
 # set according to the expected length of the marker you are searching
 # Recommended values:
