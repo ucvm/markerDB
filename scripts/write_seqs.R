@@ -18,8 +18,10 @@ seq_file = snakemake@input$seqs
 tax_file = snakemake@input$taxa
 outdir = snakemake@output[[1]]
 
-if (exists(snakemake@input$aln)) {
+if ("aln" %in% names(snakemake@input)) {
 	aln = snakemake@input$aln
+} else {
+    aln = NULL
 }
 
 
@@ -31,6 +33,10 @@ dir.create(outdir, showWarnings = FALSE)
 seqs = Biostrings::readDNAStringSet(seq_file)
 tax = readr::read_tsv(tax_file)
 
+if (!is.null(aln)) {
+    aln = Biostrings::readDNAStringSet(aln)
+}
+
 seq_df = dplyr::tibble(
   accn = names(seqs),
   seq = as.character(seqs)
@@ -41,11 +47,7 @@ db = seq_df %>% dplyr::left_join(tax)
 
 # Write out proper formats ------------------------------------------------
 
-if (exists(aln)) {
-	invoke_map(write_functions, list(list(db = db, seqs = seqs, outdir = outdir, align = aln)))
-} else {
-	invoke_map(write_functions, list(list(db = db, seqs = seqs, outdir = outdir)))
-}
+invoke_map(write_functions, list(list(db = db, seqs = seqs, outdir = outdir, align = aln)))
 
 
 

@@ -55,6 +55,20 @@ rule trim_seqs:
     script:
         "scripts/trim_seqs.R"
 
+rule align:
+    input:
+        rules.trim_seqs.output.seqs_final_nr
+    output:
+        "{outdir}/db/seqs_nr.aln".format(outdir = outdir)
+    conda:
+        "envs/align.yaml"
+    threads:
+        config["threads"]
+    shell:
+        """
+        mafft --auto --reorder --thread {threads} {input} > {output}
+        """
+
 rule write_seqs:
     input:
         seqs = rules.trim_seqs.output.seqs_final,
@@ -65,7 +79,6 @@ rule write_seqs:
         "envs/write_seqs.yaml"
     script:
         "scripts/write_seqs.R"
-        
         
 rule write_seqs_nr:
     input:
@@ -83,25 +96,10 @@ rule run_app:
     conda:
         "envs/app.yaml"
     params:
-        db_title = "Nematode ITS2",
+        db_title = config["app_title"],
         db_dir = outdir
     script:
         "scripts/app.R"
         
-
-rule align:
-    input:
-        rules.trim_seqs.output.seqs_final_nr
-    output:
-        "{outdir}/db/seqs_nr.aln".format(outdir = outdir)
-    conda:
-        "envs/align.yaml"
-    threads:
-        config["threads"]
-    shell:
-        """
-        mafft --auto --reorder --thread {threads} {input} > {output}
-        """
-
 
 
