@@ -78,12 +78,16 @@ ui = fluidPage(theme = shinytheme("yeti"),
     	fluidRow(
     		column(3,     		
 				 h3("Summary"),
-				 wellPanel(div(db_html_list))
-    	),
+				 wellPanel(div(db_html_list),
+				 					tags$small("This database was created with markerDB",
+				 										 a(icon("github"), href = "https://github.com/ucvm/markerDB", target = "_blank"))
+    			)
+				 ),
 				column(9,
 					h3("Instructions"),
 					p("Please use the options and table below to filter the database as required.", 
-						"Once it's been filtered to your liking you can download the filtered database"),
+						"Once it's been filtered to your liking you can download the filtered database.",
+						"Please keep track of your filtering steps and note these if you publish."),
 					h4("Download formats"),
 					tags$ul(
 						tags$li(
@@ -100,11 +104,15 @@ ui = fluidPage(theme = shinytheme("yeti"),
 							"A fasta file with sequence ids and taxonomy in the headers.", 
 							"Used to train a custom RDP database with the ", code("rRDP"), 
 							"Biodondcutor package (which uses the same algorithm as ", code("assignTaxonomy"), "."
+						),
+						tags$li(
+							strong("excel: "),
+							"An Excel file with the same columns in the table."
 						)
 					)
-				)	 
-    		
+    		)
     	),
+
     	hr(),
     	fluidRow(
     		column(3,
@@ -133,7 +141,7 @@ ui = fluidPage(theme = shinytheme("yeti"),
     			h3("Download"),
     			wellPanel(
 					checkboxGroupInput("download_formats", "Select formats to download",
-									   c("dada2", "mothur", "rdp", "excel"), inline = TRUE),
+									   c("dada2", "mothur", "rdp", "excel"), inline = FALSE),
 					em("Please select a format to download", id = "no_format_text"),
 					hidden(em("The accn column must be selected for database download", id = "no_accn_text")),
 					hidden(downloadButton("download", "Download"))
