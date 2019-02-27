@@ -253,7 +253,7 @@ write_tsv(final_tax_nr, taxa_outfile_nr)
 db_info = list(
 	"# Database Info",
 	paste0("Title\t", title),
-	paste0("Date\t", Sys.Date()),
+	paste0("Date Created\t", Sys.Date()),
 	paste0("Total sequences\t", length(final_seqs)),
 	paste0("Total non-redundant sequences\t", length(final_seqs_nr)),
 	paste0("Version\t", version)

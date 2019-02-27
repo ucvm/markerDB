@@ -15,12 +15,13 @@ library(purrr)
 library(tibble)
 library(glue)
 
-source("write_functions.R")
 Sys.setenv(R_ZIPCMD = "/usr/bin/zip")
 
-db_dir = "../Nematode_ITS2/"
+# source("write_functions.R")
+# db_dir = "../Nematode_ITS2/"
 
-# db_dir = snakemake@params$db_dir
+db_dir = snakemake@params$db_dir
+source("scripts/write_functions.R")
 
 
 load_database = function(db_directory) {
@@ -57,7 +58,12 @@ summarize_database = function(db) {
 database = load_database(db_dir)
 db_info = read_tsv(file.path(db_dir, "db", "db_info.txt"), comment = "#", 
 									 col_names = c("param", "value")) %>% deframe()
-db_html_list = imap(db_info, ~p(HTML(glue::glue('<strong>{.y}</strong>: {.x}'))))[-1]
+
+db_info[3:4] = prettyNum(db_info[3:4], big.mark = ",")
+
+db_html_list = imap(db_info, 
+										~p(HTML(glue::glue('<strong>{.y}</strong>: {.x}'))))[-1]
+
 
 
 ui = fluidPage(theme = shinytheme("yeti"),
@@ -75,7 +81,27 @@ ui = fluidPage(theme = shinytheme("yeti"),
 				 wellPanel(div(db_html_list))
     	),
 				column(9,
-					h3("Instructions")	
+					h3("Instructions"),
+					p("Please use the options and table below to filter the database as required.", 
+						"Once it's been filtered to your liking you can download the filtered database"),
+					h4("Download formats"),
+					tags$ul(
+						tags$li(
+							strong("dada2:"), 
+							"A fasta file with taxonomy in the headers, suitable for dada2::assignTaxonomy"
+							),
+						tags$li(
+							strong("mothur:"), 
+							"A fasta file with sequence ids as headers, a taxonomy text file, and an",
+							"alignment generated with mafft"
+							),
+						tags$li(
+							strong("rdp:"), 
+							"A fasta file with sequence ids and taxonomy in the headers.", 
+							"Used to train a custom RDP database with the ", code("rRDP"), 
+							"Biodondcutor package (which uses the same algorithm as ", code("assignTaxonomy"), "."
+						)
+					)
 				)	 
     		
     	),

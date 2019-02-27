@@ -96,7 +96,6 @@ rule run_app:
     conda:
         "envs/app.yaml"
     params:
-        db_title = config["title"],
         db_dir = outdir
     script:
         "scripts/app.R"
