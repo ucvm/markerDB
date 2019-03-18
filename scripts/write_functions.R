@@ -63,6 +63,8 @@ write_functions = list(
 		outtaxa = file.path(outdir, "mothur.tax")
 		outaln = file.path(outdir, "mothur.aln")
 		
+		ranks = get_ranks(db)
+		
 		mothur = db %>%
 			clean_db() %>% 
 			dplyr::select(accn, ranks) %>% 
