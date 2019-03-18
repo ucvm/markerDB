@@ -163,8 +163,8 @@ ui = fluidPage(theme = shinytheme("yeti"),
 
 server = function(input, output) {
 	
+	# --- choose version to show
 	filtered_data = reactive({
-		# --- choose version to show
 		if (input$show_full) {
 			display = database$db
 		} else {
@@ -173,20 +173,7 @@ server = function(input, output) {
 		display[ , input$show_columns]
 	})
 	
-	observe({
-		if (input$show_full) {
-			full = database$db
-		} else {
-			full = database$nr
-		}
-		
-		if (length(input$database_rows_all) < nrow(full)) {
-			shinyjs::show("filter_alert")
-		} else {
-			shinyjs::hide("filter_alert")
-		}
-	})
-	
+	# --- control when to show download button
 	observe({
 		if (is.null(input$download_formats)) {
 			shinyjs::hide("download")
@@ -203,6 +190,7 @@ server = function(input, output) {
 		}
 	})
 	
+	# --- summary table
 	output$summary_tbl = renderTable({
 		ranks = c("superkingdom", "kingdom", "phylum", "class", 
 				  "order","family", "genus", "species")
@@ -216,6 +204,32 @@ server = function(input, output) {
 											"Family", "Genus", "Species")))
 	}, bordered = TRUE, spacing = "xs")
 	
+
+	output$database = DT::renderDataTable({
+		
+		DT::datatable(filtered_data(), style = "bootstrap", 
+									class = "table-hover table-condensed table-striped table-responsive",
+									filter = "top")
+	})
+
+		
+	# --- filter alert
+	observe({	
+		if (input$show_full) {
+			full = database$db
+		} else {
+			full = database$nr
+		}
+		
+		if (length(input$database_rows_all) < nrow(full)) {
+			shinyjs::show("filter_alert")
+		} else {
+			shinyjs::hide("filter_alert")
+		}
+	})
+	
+	
+	# --- download
 	output$download = downloadHandler(
 		filename = "database.zip",
 		content = function(file) {
@@ -247,13 +261,7 @@ server = function(input, output) {
 		contentType = "application/zip"
 	)
 	
-	output$database = DT::renderDataTable({
-
-		DT::datatable(filtered_data(), style = "bootstrap", 
-					  class = "table-hover table-condensed table-striped table-responsive",
-					  filter = "top")
-	})
-		
+	
 }
 
 # Run the application 
