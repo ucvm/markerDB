@@ -2,7 +2,9 @@
 
 ## Overview
 
-markerDB is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) pipeline to build databases of a marker gene sequence for a given taxonomy.  Currently it supports ITS2 and 18S sequences.  The pipeline retrieves sequences from NCBI annotated with the provided marker, identifies the correct region (with a covariance model using [Infernal](http://eddylab.org/infernal/)) and formats them for common pipelins like RDP, dada2 and mothur.
+markerDB is a [Snakemake](https://snakemake.readthedocs.io/en/stable/) pipeline to build databases of a marker gene sequence for a given taxonomy.  Currently it supports ITS2 and 18S sequences.  The pipeline retrieves sequences from NCBI annotated with the provided marker, identifies the correct region (with a co-variance model using [Infernal](http://eddylab.org/infernal/)) and formats them for common pipelines like RDP, dada2 and mothur. Also included is a simple [shiny](https://shiny.rstudio.com/) app for sharing the database online.
+
+This pipeline was used to build an ITS2 database for nematodes and is available [here](https://cooperia.chgi.ucalgary.ca/Nematode_ITS2/)
 
 ## Install :computer:
 
@@ -46,7 +48,7 @@ Edit the `config.yaml` file with a file editor of your choice and adjust the fol
 
 * *out_directory*: Output directory to store the files.  Will be created if it doesn't exist
 
-* *max_width*: The final sequences will be trimmed to be no more than this many basepairs long.
+* *max_width*: The final sequences will be trimmed to be no more than this many base pairs long.
 
 * *min_width*: As above but minimum width
 
@@ -70,14 +72,14 @@ The first run will take a little bit longer as Snakemake will build the conda en
 
 ### Compute requirements
 
-Mostly time :hourglass:.  `cmscan` is the main time consuming process and can be sped up to some degree by providing more threads. The pipeline doesn't require excesive memory and can likely be run on a decently powered desktop in a few hours. But this depends strongly on the number of sequences being downloaded. Snakemake has excellent support for compute clusters so if you have access to one this is recommended.  Please see the Snakemake documentation for more details on how to do this.  Also note that this will run on MacOS or Linux only as with the majority of bioinformatics applications.
+Mostly time :hourglass:.  `cmscan` is the main time consuming process and can be sped up to some degree by providing more threads. The pipeline doesn't require excessive memory and can likely be run on a decently powered desktop in a few hours. But this depends strongly on the number of sequences being downloaded. Snakemake has excellent support for compute clusters so if you have access to one this is recommended.  Please see the Snakemake documentation for more details on how to do this.  Also note that this will run on MacOS or Linux only as with the majority of bioinformatics applications.
 
 
 ## Details :mag:
 
 ### Step 1: Get sequences
 
-This step utilizes the `rentrez` R package to search NCBI for sequences annoated as ITS2 for your given organism.  The exact search terms are:
+This step utilizes the `rentrez` R package to search NCBI for sequences annotated as ITS2 for your given organism.  The exact search terms are:
 
 ```
 ITS2: {organism}[ORGN] (ITS2 OR internal transcribed spacer 2)
@@ -90,7 +92,7 @@ Taxonomy for each of the sequences is retrieved from NBCI Taxonomy with the `tax
 
 ### Step 2: Trim sequences
 
-For the 18S the sequences are trimmed to the region identified in the search.  However, the ITS2 is more complicated as no good sequence models exist that capture a wide range of diversity due to the divergence of this region.  Relying soley on the annotion in NCBI is also not feasable as many of the ITS2 sequences will also contain the other ribosomal genes, especially the 5.8S and partial 28S genes.  
+For the 18S the sequences are trimmed to the region identified in the search.  However, the ITS2 is more complicated as no good sequence models exist that capture a wide range of diversity due to the divergence of this region.  Relying solely on the annotation in NCBI is also not feasible as many of the ITS2 sequences will also contain the other ribosomal genes, especially the 5.8S and partial 28S genes.  
 
 After the additional rRNA genes are identified the sequences are trimmed to this region.  If no additional rRNA genes were found the sequence is returned untouched if the `return_untrimmed` parameter is set.  Otherwise these are discarded.  It is suggested to leave this set to `TRUE` as many ITS2 sequences have been deposited to NCBI already trimmed to that region.
 
@@ -100,7 +102,7 @@ The sequences are then clipped to at most `max_width` and at minimum `min_width`
 
 Although not required for many taxonomic classifiers, like RDP, some pipelines (like mothur) sometimes do require an alignment the database is aligned using mafft.  
 
-This step is not done automatically.  Run `snakemake -j 2 --use-conda align` to generate an aligment. 
+This step is not done automatically.  Run `snakemake -j 2 --use-conda align` to generate an alignment. 
 
 ### Step 5:  Outputs
 
@@ -126,16 +128,21 @@ These formats are listed below and will be found the `formats` folder.
 
 Files appropriate for [IDTAXA](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-018-0521-5) will be coming shortly.
 
+### Step 6: Share
+
+Now it's time to share with others!  The app can be run with `snakemake --use-conda run_app` and this will pop up a browser window on your local computer with the app running.  But if you really want to share you'll need to run this with a publicly accessible Shiny server somewhere.  You'll need the `scripts/app.R` and `scripts/write_functions.R` files and of course the database output from above (just the `db` directory is sufficient).  A bit of Shiny skill is recommend before undertaking this route.
+
+Alternatively, if the files aren't huge (< 100 MB) you may just want to share your database on Github.
 
 ## TODO :hammer:
 
-* Add update step to avoid redownloading existing sequences
+* Add update step to avoid re-downloading existing sequences
   - this will likely entail an ids file that lists all searched sequences
 * Some sort of filtering on per species basis (by clustering).  There are some clear outliers that need to be cleaned out.
 
 ## For the pros :trophy:
 
-For doing it your own way the best bet is to fork the repository and edit away.  This way your changes will be preserved so you can publishe them properly!  Pull requests are welcome but need to be broadly useful and well tested.
+For doing it your own way the best bet is to fork the repository and edit away.  This way your changes will be preserved so you can publish them properly!  Pull requests are welcome but need to be broadly useful and well tested.
 
 Other typos/errors can also be corrected with pull requests or by submitting an issue.
 
