@@ -10,6 +10,7 @@ library(stringr)
 library(dplyr)
 library(readr)
 library(tidyr)
+library(Biostrings)
 
 organism = snakemake@config$organism
 marker = snakemake@config$marker
@@ -126,14 +127,30 @@ retrieve_and_write_sequences = function(ids, outfile) {
  																retmode = "text")) %>% 
  		flatten()
 	
- 	message("Writing fasta of hits")
- 	if (file.exists(outfile)) {
- 		warning(outfile, " exists, removing..")
- 		file.remove(outfile)
- 	}
- 	
+	message("Writing fasta of hits")
+	if (file.exists(outfile)) {
+		warning(outfile, " exists, removing..")
+		file.remove(outfile)
+	}
+	
 	seqs %>%
   	walk(~write_file(.x, outfile, append = TRUE))
+ 	
+ 	
+ 	# add additional filtering to remove false positive hits to ITS1 - not sure why these are there 
+ 	raw = readDNAStringSet(outfile)
+ 	reg = "(?:ITS2)|(?:ITS-2)|([Ii]nternal transcribed spacer 2)|(second internal transcribed spacer)|(internal transcribed spacers 1 and 2)"
+ 	keeps = str_detect(names(raw), reg)
+ 	
+ 	raw = raw[keeps]
+ 	
+ 	if (length(raw) == 0) {
+ 		stop("Problem filtering out mismatched ITS2 - bad problem - please contact developers.")
+ 	}
+	
+ 	
+	writeXStringSet(raw, outfile)
+	
 }
 
 
