@@ -38,12 +38,12 @@ if (!is.null(aln)) {
     aln = Biostrings::readDNAStringSet(aln)
 }
 
-seq_df = dplyr::tibble(
-  accn = names(seqs),
-  seq = as.character(seqs)
-)
-
-db = seq_df %>% dplyr::left_join(tax)
+# seq_df = dplyr::tibble(
+#   accn = names(seqs),
+#   seq = as.character(seqs)
+# )
+# 
+# db = seq_df %>% dplyr::left_join(tax)
 
 
 # Write out proper formats ------------------------------------------------

@@ -28,7 +28,7 @@ make_taxid = function(db, ranks) {
 	
 	uniq_taxa = db %>% 
 		clean_db() %>% 
-		select(-uid, -seq, -accn) %>% 
+		select(-uid, -accn) %>% 
 		distinct(taxid, .keep_all = TRUE) %>% 
 		select(-taxid) 
 	
@@ -123,7 +123,7 @@ write_functions = list(
 		
 		outfasta = file.path(outdir, "idtaxa.fasta")
 		outtaxa = file.path(outdir, "idtaxa.tax")
-		
+	
 		ranks = get_ranks(db)
 		
 		idtaxa = db %>% 
