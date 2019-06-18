@@ -17,12 +17,12 @@ library(glue)
 
 Sys.setenv(R_ZIPCMD = "/usr/bin/zip")
 
-source("write_functions.R")
-db_dir = "../../Nematode_ITS2_1.0.0/"
+# source("write_functions.R")
+# db_dir = "../../Nematode_ITS2_1.0.0/"
 
 
-#db_dir = snakemake@params$db_dir
-#source("scripts/write_functions.R")
+db_dir = snakemake@params$db_dir
+source("scripts/write_functions.R")
 
 
 load_database = function(db_directory) {
