@@ -17,11 +17,12 @@ library(glue)
 
 Sys.setenv(R_ZIPCMD = "/usr/bin/zip")
 
-# source("write_functions.R")
-# db_dir = "../Nematode_ITS2/"
+source("write_functions.R")
+db_dir = "../../Nematode_ITS2_1.0.0/"
 
-db_dir = snakemake@params$db_dir
-source("scripts/write_functions.R")
+
+#db_dir = snakemake@params$db_dir
+#source("scripts/write_functions.R")
 
 
 load_database = function(db_directory) {
@@ -106,6 +107,11 @@ ui = fluidPage(theme = shinytheme("yeti"),
 							"Biodondcutor package (which uses the same algorithm as ", code("assignTaxonomy"), "."
 						),
 						tags$li(
+							strong("idtaxa:"), 
+							"A fasta file with taxonomy in the headers, and a taxid file suitable for", 
+							"IDTAXA with DECIPHER::LearnTaxa"
+						),
+						tags$li(
 							strong("excel: "),
 							"An Excel file with the same columns in the table."
 						)
@@ -141,7 +147,7 @@ ui = fluidPage(theme = shinytheme("yeti"),
     			h3("Download"),
     			wellPanel(
 					checkboxGroupInput("download_formats", "Select formats to download",
-									   c("dada2", "mothur", "rdp", "excel"), inline = FALSE),
+									   c("dada2", "mothur", "rdp", "idtaxa", "excel"), inline = FALSE),
 					em("Please select a format to download", id = "no_format_text"),
 					hidden(em("The accn column must be selected for database download", id = "no_accn_text")),
 					hidden(downloadButton("download", "Download"))

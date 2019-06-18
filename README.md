@@ -125,8 +125,17 @@ These formats are listed below and will be found the `formats` folder.
 * dada2: dada2's `assignTaxonomy` function
 * RDP: to train a custom RDP database with the `rRDP` Bioconductor package (this is pretty much the same as `assignTaxonomy`)
 * mothur: a fasta file and paired mothur taxonomy file.  Works with the [Nemabiome](https://www.nemabiome.ca/) pipeline.  An alignment is also written out that should work with mothur, but can also be used for other pipelines as needed.
+* idtaxa: a fasta file and taxonomy file for [IDTAXA](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-018-0521-5).  The IDTAXA classifer can be trained as follows: 
+```
+library(DECIPHER)
+library(Biostrings)
+library(readr)
 
-Files appropriate for [IDTAXA](https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-018-0521-5) will be coming shortly.
+seq = readDNAStringSet("idtaxa.fasta")
+tax = read_tsv("idtaxa.tax")
+train = LearnTaxa(seq, names(seq), tax)
+```
+
 
 ### Step 6: Share
 

@@ -9,6 +9,7 @@ library(readr)
 library(dplyr)
 library(stringr)
 library(purrr)
+library(tidyr)
 
 source("scripts/write_functions.R")
 

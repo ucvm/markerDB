@@ -22,6 +22,42 @@ clean_db = function(db) {
 }
 
 
+make_taxid = function(db, ranks) {
+	
+	int_ranks = set_names(1L:length(ranks), ranks)
+	
+	uniq_taxa = db %>% 
+		clean_db() %>% 
+		select(-uid, -seq, -accn) %>% 
+		distinct(taxid, .keep_all = TRUE) %>% 
+		select(-taxid) 
+	
+	taxid = uniq_taxa %>% 
+		gather(Rank, Name) %>% 
+		distinct(Name, .keep_all = TRUE) %>% 
+		mutate(Index = row_number()) %>% 
+		mutate(Level = int_ranks[Rank]) %>% 
+		select(Index, Name, Level, Rank)
+	
+	parent_map = 	transpose(uniq_taxa) %>% 
+		map_dfr(~tibble(Name = flatten_chr(.x), 
+										parent_name = flatten_chr(c("Root", .x[1:length(.x) - 1])))) %>% 
+		distinct() %>%
+		mutate(Parent = set_names(taxid$Index, taxid$Name)[parent_name]) %>% 
+		select(-parent_name) %>% 
+		mutate(Parent = if_else(is.na(Parent), 0L, Parent))
+	
+	taxid = taxid %>% left_join(parent_map) %>% 
+		select(Index, Name, Parent, Level, Rank)
+	
+	taxid = bind_rows(
+		tibble(Index = 0, Name = "Root", Parent = -1, Level = 0, Rank = "rootrank"
+		), taxid)
+	
+	taxid
+}
+
+
 write_functions = list(
 	dada2 = function(db, seqs, outdir, align = NULL) {
 		
@@ -79,6 +115,29 @@ write_functions = list(
 			Biostrings::writeXStringSet(align, outaln)
 			file_list = c(outaln, file_list)
 		}
+		
+		return(file_list)
+	},
+	
+	idtaxa = function(db, seqs, outdir, align = NULL) {
+		
+		outfasta = file.path(outdir, "idtaxa.fasta")
+		outtaxa = file.path(outdir, "idtaxa.tax")
+		
+		ranks = get_ranks(db)
+		
+		idtaxa = db %>% 
+			clean_db() %>% 
+			mutate(root = "Root") %>% 
+			dplyr::select(accn, root, ranks) %>% 
+			tidyr::unite("tax", -accn, sep = ";") %>% 
+			dplyr::pull(tax)
+		
+		Biostrings::writeXStringSet(setNames(seqs, idtaxa), outfasta)
+		
+		make_taxid(db, ranks) %>% write_tsv(outtaxa)
+		
+		file_list = list(outfasta, outtaxa)
 		
 		return(file_list)
 	}
